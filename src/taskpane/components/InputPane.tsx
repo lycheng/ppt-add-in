@@ -4,6 +4,7 @@ import { Stack } from '@fluentui/react';
 
 interface InputPaneProps {
     handleSubmit: (text: string) => Promise<any>;
+    openPPTGenerateDialog: () => void;
 }
 
 
@@ -66,12 +67,23 @@ const InputPane: React.FC<InputPaneProps> = (props: InputPaneProps) => {
             style={{
               width: "120px", // 固定宽度
               height: "36px", // 固定高度(可选)
+              marginRight: "5px"
             }}
             onClick={conClickSubmit}
             disabled={!inputValue.trim() || isSubmitting}
             icon={isSubmitting ? { children: "⏳" } : undefined}
           >
             {isSubmitting ? "Sending..." : "Enter"}
+          </Button>
+          <Button
+            appearance="secondary"
+            style={{
+              width: "120px", // 固定宽度
+              height: "36px", // 固定高度(可选)
+            }}
+            onClick={props.openPPTGenerateDialog}
+          >
+            Generate PPT
           </Button>
         </div>
       </Stack>
