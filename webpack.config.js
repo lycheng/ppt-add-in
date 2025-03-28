@@ -24,6 +24,10 @@ module.exports = async (env, options) => {
         import: ["./src/taskpane/index.tsx", "./src/taskpane/taskpane.html"],
         dependOn: "react",
       },
+      dialog: {
+        import: ["./src/dialog/dialog.tsx", "./src/dialog/dialog.html"],
+        dependOn: "react",
+      },
       commands: "./src/commands/commands.ts",
     },
     output: {
@@ -65,6 +69,11 @@ module.exports = async (env, options) => {
         filename: "taskpane.html",
         template: "./src/taskpane/taskpane.html",
         chunks: ["polyfill", "taskpane", "react"],
+      }),
+      new HtmlWebpackPlugin({
+        filename: "dialog.html",
+        template: "./src/dialog/dialog.html",
+        chunks: ["polyfill", "dialog", "react"],
       }),
       new CopyWebpackPlugin({
         patterns: [

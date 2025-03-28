@@ -12,8 +12,8 @@ const useStyles = makeStyles({
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
-    paddingBottom: "30px",
-    paddingTop: "100px",
+    paddingBottom: "10px",
+    paddingTop: "10px",
     backgroundColor: tokens.colorNeutralBackground3,
   },
   message: {

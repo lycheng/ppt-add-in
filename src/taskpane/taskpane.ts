@@ -2,27 +2,24 @@
 // apiClient.ts
 import axios, { AxiosResponse } from 'axios';
 
+export interface ConversationItem {
+  role: string
+  content: string
+}
 
-async function apiGenerateTOC(text: string): Promise<string> {
+export async function postChat(items: ConversationItem[]): Promise<ConversationItem[]> {
   try {
-    const response = await axios.post('http://localhost:8000/toc', {
-      topic: text
+    const response = await axios.post('http://localhost:8000/chat', {
+      history: items
     });
-
-    return response.data.content;
+    return response.data.history;
   } catch (error) {
-    console.error('Error:', error.response?.data || error.message);
-    throw error;
+    console.error('Failed to create user:', error);
+    return error;
   }
 }
 
-// async function apiGenerateTOC(text: string) {
-//   try {
-
-
 export async function generateTOC(text: string): Promise<string> {
-  // console.log(text);
-  // return "# header 1\n# header 2\n# header 3";
   try {
     const response = await axios.post('http://localhost:8000/toc', {
       topic: text
@@ -32,6 +29,16 @@ export async function generateTOC(text: string): Promise<string> {
     console.error('Failed to create user:', error);
     return error;
   }
+}
+
+async function removeShapes(context: PowerPoint.RequestContext, index: number) {
+  const shapes: PowerPoint.ShapeCollection = context.presentation.slides.getItemAt(index).shapes;
+  shapes.load("items/$none");
+  await context.sync();
+  shapes.items.forEach(function (shape) {
+    shape.delete();
+  });
+  await context.sync();
 }
 
 async function _addHeader(context: PowerPoint.RequestContext, itemAt: number, text: string, color: string, left: number, top: number, height: number, width: number, fontSize: number) {
@@ -61,6 +68,7 @@ async function addSubHeader(context: PowerPoint.RequestContext, index: number, t
   index += 1;
 
   await context.sync()
+  await removeShapes(context, index);
   await _addHeader(context, index, text, 'black', 10, 10, 50, 800, 30)
   return index
 }
@@ -93,40 +101,13 @@ export async function generatePPT(text: string) {
     return error;
   }
   const payload = response.data;
-  // console.log(text);
-  // const payload = {
-  //   "content": [
-  //     {
-  //       "children": [],
-  //       "level": 1,
-  //       "text": "Life Insurance",
-  //       "type": "heading"
-  //     },
-  //     {
-  //       "children": [],
-  //       "level": 2,
-  //       "text": "Overview",
-  //       "type": "heading"
-  //     },
-  //     {
-  //       "children": [],
-  //       "level": 3,
-  //       "text": "Overview",
-  //       "type": "heading"
-  //     },
-  //     {
-  //       "type": "paragraph",
-  //       "text": "Term life insurance offers coverage for a specified period, typically 10, 20, or 30 years. It is often the most affordable option, making it ideal for individuals with specific financial obligations, such as mortgage payments or children's education."
-  //     },
-  //   ]
-  // }
-
   try {
     await PowerPoint.run(async (context: PowerPoint.RequestContext) => {
       var index = 0;
       var paddingTop = 10;
       for (const item of payload.structure) {
         if (item.level == 1 && item.type == "heading") {
+          await removeShapes(context, index);
           await addHeader(context, item.text);
         } else if (item.level == 2 && item.type == "heading") {
           index = await addSubHeader(context, index, item.text);

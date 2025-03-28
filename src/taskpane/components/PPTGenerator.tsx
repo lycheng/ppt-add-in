@@ -32,11 +32,12 @@ const useStyles = makeStyles({
   },
 });
 
-const TopicInsertion: React.FC<TopicInsertionProps> = (props: TopicInsertionProps) => {
+const PPTGenerator: React.FC<TopicInsertionProps> = (props: TopicInsertionProps) => {
   const [text, setText] = useState<string>("Life insurance");
   const [toc, setToc] = useState<string>("");
 
   const handleTOCGeneration = async () => {
+    setToc("");
     const generatedTOC = await props.generateTOC(text);
     setToc(generatedTOC);
   };
@@ -90,4 +91,4 @@ const TopicInsertion: React.FC<TopicInsertionProps> = (props: TopicInsertionProp
   );
 };
 
-export default TopicInsertion;
+export default PPTGenerator;

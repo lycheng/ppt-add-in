@@ -26,8 +26,11 @@
     "watch": "webpack --mode development --watch"
   },
   "dependencies": {
+    "@fluentui-contrib/react-chat": "^0.1.10",
+    "@fluentui/react": "^8.122.14",
     "@fluentui/react-components": "^9.55.1",
     "@fluentui/react-icons": "^2.0.264",
+    "@marp-team/marpit": "^3.1.2",
     "axios": "^1.8.4",
     "core-js": "^3.36.0",
     "es6-promise": "^4.2.8",
