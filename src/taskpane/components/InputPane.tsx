@@ -4,7 +4,7 @@ import { Stack } from '@fluentui/react';
 
 interface InputPaneProps {
     handleSubmit: (text: string) => Promise<any>;
-    openPPTGenerateDialog: () => void;
+    openDialog: () => void;
 }
 
 
@@ -81,7 +81,7 @@ const InputPane: React.FC<InputPaneProps> = (props: InputPaneProps) => {
               width: "120px", // 固定宽度
               height: "36px", // 固定高度(可选)
             }}
-            onClick={props.openPPTGenerateDialog}
+            onClick={props.openDialog}
           >
             Generate PPT
           </Button>

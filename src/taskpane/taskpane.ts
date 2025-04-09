@@ -2,9 +2,16 @@
 // apiClient.ts
 import axios, { AxiosResponse } from 'axios';
 
+export interface TOCPayload {
+  topic: string
+  toc: string
+}
+
 export interface ConversationItem {
   role: string
   content: string
+  topic?: string
+  toc?: string
 }
 
 export async function postChat(items: ConversationItem[]): Promise<ConversationItem[]> {

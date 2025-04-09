@@ -10,7 +10,7 @@ const useStyles = makeStyles({
     display: "flex",
     flexDirection: "column",
     padding: '20px',
-    gap: "20px",  // Increased gap for better spacing
+    gap: "20px",
   },
   inputGroup: {
     display: "flex",
@@ -39,6 +39,15 @@ const DialogApp = () => {
     setToc(newToc);
   }
 
+  const clickConfirmTOC = async () => {
+    if (!toc.trim()) return;
+
+    Office.context.ui.messageParent(JSON.stringify({
+      topic: topic,
+      toc: toc
+    }));
+  }
+
   const highlightWithTitles = (code) => {
     let highlighted = highlight(code, languages.markdown, "markdown");
     return highlighted;
@@ -60,20 +69,25 @@ const DialogApp = () => {
       </div>
       <div className={styles.editorContainer}>
         {toc && (
-          <Editor
-            value={toc}
-            onValueChange={setToc}
-            highlight={highlightWithTitles}
-            padding={10}
-            style={{
-              backgroundColor: "#f5f5f5",
-              minHeight: "300px",
-              borderRadius: "4px",
-              border: "1px solid #ddd",
-            }}
-            textareaClassName="editor-textarea"
-            preClassName="language-markdown"
-          />
+          <div>
+            <Editor
+              value={toc}
+              onValueChange={setToc}
+              highlight={highlightWithTitles}
+              padding={10}
+              style={{
+                backgroundColor: "#f5f5f5",
+                minHeight: "300px",
+                borderRadius: "4px",
+                border: "1px solid #ddd",
+              }}
+              textareaClassName="editor-textarea"
+              preClassName="language-markdown"
+            />
+            <Button appearance="primary" onClick={clickConfirmTOC} style={{paddingTop: "5px"}}>
+              Confirm
+            </Button>
+          </div>
         )}
       </div>
     </div>

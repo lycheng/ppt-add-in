@@ -5,7 +5,7 @@ import { useState } from "react";
 // import Dialog from "./Dialog";
 import { makeStyles } from "@fluentui/react-components";
 import InputPane from "./InputPane";
-import { ConversationItem, postChat } from "../taskpane";
+import { ConversationItem, TOCPayload, postChat } from "../taskpane";
 import { Conversation } from "./Conversation";
 // import { generatePPT, generateTOC } from "../taskpane";
 
@@ -33,26 +33,35 @@ const App: React.FC<AppProps> = (props: AppProps) => {
     console.log(conversation);
   }
 
-  const openPPTGenerateDialog = async () => {
+  const openDialog = async () => {
     Office.context.ui.displayDialogAsync(
       window.location.origin + "/dialog.html", // 对话框 URL
       {
-        height: 40, // 高度百分比（40%）
-        width: 30,  // 宽度百分比（30%）
+        height: 60, // 高度百分比（40%）
+        width: 60,  // 宽度百分比（30%）
         promptBeforeOpen: false,
       },
       (result) => {
         if (result.status === Office.AsyncResultStatus.Failed) {
-          console.error("Dialog 打开失败:", result.error.message);
-        } else {
-          const dialog = result.value;
-          // 监听 Dialog 返回的消息
-          dialog.addEventHandler(Office.EventType.DialogMessageReceived, (message) => {
-            console.log("收到 Dialog 数据:", message);
-            // 在这里处理数据（例如更新 PPT）
-            dialog.close();
-          });
+          console.error("Dialog open failed:", result.error.message);
+          return;
         }
+        const dialog = result.value;
+        dialog.addEventHandler(Office.EventType.DialogMessageReceived, (m) => {
+          if ("message" in m) {
+            const payload = JSON.parse(m.message);
+            console.log("dialog message:", m);
+            const item: ConversationItem = {
+              role: "ai",
+              content: `You are going to generate topic: ${payload.topic}`,
+            };
+            const newConversation = [...conversation, item];
+            setConversation(newConversation);
+          } else {
+            console.error("dialog message failed:", m);
+          }
+          dialog.close();
+        });
       }
     );
   }
@@ -61,7 +70,7 @@ const App: React.FC<AppProps> = (props: AppProps) => {
     <div className={styles.root}>
       <Header logo="assets/logo-filled.png" title={props.title} message="Office AI" />
       <Conversation conversation={conversation}></Conversation>
-      <InputPane handleSubmit={handleInputSubmit} openPPTGenerateDialog={openPPTGenerateDialog}></InputPane>
+      <InputPane handleSubmit={handleInputSubmit} openDialog={openDialog}></InputPane>
       {/* <PPTGenerator generateTOC={generateTOC} generatePPT={generatePPT}/> */}
       {/* <Dialog></Dialog> */}
     </div>

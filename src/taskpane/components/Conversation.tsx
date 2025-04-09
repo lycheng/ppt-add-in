@@ -26,7 +26,9 @@ export const Conversation: React.FC<ConversationProps> = (props: ConversationPro
           return (
             <ChatMessage
               avatar={<Avatar name="AI" badge={{ status: "available" }} icon={<BotRegular />} />}
-            >{item.content}</ChatMessage>
+            >
+              {item.content}
+            </ChatMessage>
           );
         })}
     </Chat>
