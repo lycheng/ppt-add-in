@@ -38,6 +38,18 @@ export async function generateTOC(text: string): Promise<string> {
   }
 }
 
+export async function generatePPTBase64(content: string): Promise<string> {
+  try {
+    const response = await axios.post('http://localhost:8000/ppt/generate', {
+      content: content
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Failed to create user:', error);
+    return error;
+  }
+}
+
 async function removeShapes(context: PowerPoint.RequestContext, index: number) {
   const shapes: PowerPoint.ShapeCollection = context.presentation.slides.getItemAt(index).shapes;
   shapes.load("items/$none");

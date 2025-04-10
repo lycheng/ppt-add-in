@@ -5,7 +5,7 @@ import { useState } from "react";
 // import Dialog from "./Dialog";
 import { makeStyles } from "@fluentui/react-components";
 import InputPane from "./InputPane";
-import { ConversationItem, TOCPayload, postChat } from "../taskpane";
+import { ConversationItem, postChat, generatePPTBase64 } from "../taskpane";
 import { Conversation } from "./Conversation";
 // import { generatePPT, generateTOC } from "../taskpane";
 
@@ -47,20 +47,32 @@ const App: React.FC<AppProps> = (props: AppProps) => {
           return;
         }
         const dialog = result.value;
-        dialog.addEventHandler(Office.EventType.DialogMessageReceived, (m) => {
+        dialog.addEventHandler(Office.EventType.DialogMessageReceived, async (m) => {
           if ("message" in m) {
             const payload = JSON.parse(m.message);
             console.log("dialog message:", m);
             const item: ConversationItem = {
               role: "ai",
-              content: `You are going to generate topic: ${payload.topic}`,
+              content: `We are going to generate topic: ${payload.topic}`,
             };
             const newConversation = [...conversation, item];
             setConversation(newConversation);
+            dialog.close();
+            const base64encoded = await generatePPTBase64(payload.toc);
+            await PowerPoint.run(async function (context) {
+              context.presentation.insertSlidesFromBase64(base64encoded);
+              await context.sync();
+            });
+            const generate_finished_item: ConversationItem = {
+              role: "ai",
+              content: `We have generated a new PPT`,
+            };
+            const _newConversation = [...newConversation, generate_finished_item];
+            setConversation(_newConversation);
           } else {
+            dialog.close();
             console.error("dialog message failed:", m);
           }
-          dialog.close();
         });
       }
     );
