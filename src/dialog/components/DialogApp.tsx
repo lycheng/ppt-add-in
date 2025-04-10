@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Input, Button, makeStyles, useId } from "@fluentui/react-components";
+import { Input, Button, makeStyles, Spinner } from "@fluentui/react-components";
 import Editor from 'react-simple-code-editor';
 import { highlight, languages } from 'prismjs';
 import 'prismjs/components/prism-markdown';
@@ -16,6 +16,7 @@ const useStyles = makeStyles({
     display: "flex",
     flexDirection: "row",
     gap: "10px",
+    alignItems: "center" // Add this to align spinner with button
   },
   editorContainer: {
     width: "80%"
@@ -26,7 +27,7 @@ const DialogApp = () => {
   const styles = useStyles();
   const [topic, setTopic] = React.useState("");
   const [toc, setToc] = React.useState<string>("");
-
+  const [isGenerating, setIsGenerating] = React.useState(false); // New state for loading
 
   const handleTopicChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     setTopic(event.target.value);
@@ -35,16 +36,28 @@ const DialogApp = () => {
   const clickGenerateTOC = async () => {
     if (!topic.trim()) return;
 
-    const newToc = await generateTOC(topic);
-    setToc(newToc);
-  }
+    setIsGenerating(true); // Start loading
+    try {
+      const newToc = await generateTOC(topic);
+      setToc(newToc);
+    } finally {
+      setIsGenerating(false); // Stop loading regardless of success/failure
+    }
+  };
 
   const clickConfirmTOC = async () => {
     if (!toc.trim()) return;
 
     Office.context.ui.messageParent(JSON.stringify({
+      type: "topic",
       topic: topic,
       toc: toc
+    }));
+  }
+
+  const clickPing = () => {
+    Office.context.ui.messageParent(JSON.stringify({
+      type: "ping",
     }));
   }
 
@@ -63,9 +76,21 @@ const DialogApp = () => {
           value={topic}
           onChange={handleTopicChange}
         />
-        <Button appearance="primary" onClick={clickGenerateTOC}>
-          Generate
+        <Button
+          appearance="primary"
+          onClick={clickGenerateTOC}
+          disabled={isGenerating} // Disable button while loading
+        >
+          {isGenerating ? (
+            <>
+              <Spinner size="tiny" style={{ marginRight: "8px" }} />
+              Generating...
+            </>
+          ) : (
+            "Generate"
+          )}
         </Button>
+        <Button appearance="secondary" onClick={clickPing} disabled={isGenerating}>Ping</Button>
       </div>
       <div className={styles.editorContainer}>
         {toc && (
@@ -84,7 +109,7 @@ const DialogApp = () => {
               textareaClassName="editor-textarea"
               preClassName="language-markdown"
             />
-            <Button appearance="primary" onClick={clickConfirmTOC} style={{paddingTop: "5px"}}>
+            <Button appearance="primary" onClick={clickConfirmTOC} style={{ marginTop: "5px" }}>
               Confirm
             </Button>
           </div>

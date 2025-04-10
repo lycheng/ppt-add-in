@@ -7,6 +7,7 @@ import { makeStyles } from "@fluentui/react-components";
 import InputPane from "./InputPane";
 import { ConversationItem, postChat, generatePPTBase64 } from "../taskpane";
 import { Conversation } from "./Conversation";
+import parseDialogMessage from "../schema";
 // import { generatePPT, generateTOC } from "../taskpane";
 
 interface AppProps {
@@ -30,7 +31,46 @@ const App: React.FC<AppProps> = (props: AppProps) => {
     };
     const newConversation = [...conversation, item];
     setConversation(await postChat(newConversation));
-    console.log(conversation);
+  }
+
+  const handleDialogMessage = async(dialog: Office.Dialog, handler: any) => {
+    if (!("message" in handler) || handler === undefined) {
+      dialog.close();
+      console.error("dialog message failed:", handler);
+      return;
+    } 
+
+    const m = parseDialogMessage(handler.message);
+    if (m === null) {
+      dialog.close();
+      console.error("dialog message failed:", m);
+      return;
+    }
+
+    if (m.type === "ping") {
+      const item: ConversationItem = {
+        role: "ai",
+        content: `Pong`,
+      };
+      setConversation(prev => [...prev, item]);
+    } else if (m.type === "topic") {
+      const item: ConversationItem = {
+        role: "ai",
+        content: `We are going to generate topic: ${m.topic}`,
+      };
+      setConversation(prev => [...prev, item]);
+      const base64encoded = await generatePPTBase64(m.toc);
+      await PowerPoint.run(async function (context) {
+        context.presentation.insertSlidesFromBase64(base64encoded);
+        await context.sync();
+      });
+      const generate_finished_item: ConversationItem = {
+        role: "ai",
+        content: `We have generated a new PPT`,
+      };
+      setConversation(prev => [...prev, generate_finished_item]);
+    }
+
   }
 
   const openDialog = async () => {
@@ -47,32 +87,8 @@ const App: React.FC<AppProps> = (props: AppProps) => {
           return;
         }
         const dialog = result.value;
-        dialog.addEventHandler(Office.EventType.DialogMessageReceived, async (m) => {
-          if ("message" in m) {
-            const payload = JSON.parse(m.message);
-            console.log("dialog message:", m);
-            const item: ConversationItem = {
-              role: "ai",
-              content: `We are going to generate topic: ${payload.topic}`,
-            };
-            const newConversation = [...conversation, item];
-            setConversation(newConversation);
-            dialog.close();
-            const base64encoded = await generatePPTBase64(payload.toc);
-            await PowerPoint.run(async function (context) {
-              context.presentation.insertSlidesFromBase64(base64encoded);
-              await context.sync();
-            });
-            const generate_finished_item: ConversationItem = {
-              role: "ai",
-              content: `We have generated a new PPT`,
-            };
-            const _newConversation = [...newConversation, generate_finished_item];
-            setConversation(_newConversation);
-          } else {
-            dialog.close();
-            console.error("dialog message failed:", m);
-          }
+        dialog.addEventHandler(Office.EventType.DialogMessageReceived, async (msg) => {
+          await handleDialogMessage(dialog, msg);
         });
       }
     );

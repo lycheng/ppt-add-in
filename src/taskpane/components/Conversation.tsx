@@ -19,13 +19,13 @@ export const Conversation: React.FC<ConversationProps> = (props: ConversationPro
         Hi, I'm Office AI, how can I help you?
       </ChatMessage>
       {props.conversation.length > 0 &&
-        props.conversation.map((item) => {
+        props.conversation.map((item, index) => {
           if (item.role === "human") {
-            return <ChatMyMessage>{item.content}</ChatMyMessage>;
+            return <ChatMyMessage key={index}>{item.content}</ChatMyMessage>;
           }
           return (
             <ChatMessage
-              avatar={<Avatar name="AI" badge={{ status: "available" }} icon={<BotRegular />} />}
+              avatar={<Avatar name="AI" badge={{ status: "available" }} icon={<BotRegular />} key={index} />}
             >
               {item.content}
             </ChatMessage>
