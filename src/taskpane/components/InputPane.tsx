@@ -65,7 +65,7 @@ const InputPane: React.FC<InputPaneProps> = (props: InputPaneProps) => {
           <Button
             appearance="primary"
             style={{
-              width: "120px", // 固定宽度
+              width: "100px", // 固定宽度
               height: "36px", // 固定高度(可选)
               marginRight: "5px"
             }}
@@ -78,12 +78,12 @@ const InputPane: React.FC<InputPaneProps> = (props: InputPaneProps) => {
           <Button
             appearance="secondary"
             style={{
-              width: "120px", // 固定宽度
+              width: "100px", // 固定宽度
               height: "36px", // 固定高度(可选)
             }}
             onClick={props.openDialog}
           >
-            Generate PPT
+            Draft PPT
           </Button>
         </div>
       </Stack>

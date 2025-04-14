@@ -1,14 +1,11 @@
 import * as React from "react";
 import Header from "./Header";
 import { useState } from "react";
-// import PPTGenerator from "./PPTGenerator";
-// import Dialog from "./Dialog";
 import { makeStyles } from "@fluentui/react-components";
 import InputPane from "./InputPane";
 import { ConversationItem, postChat, generatePPTBase64 } from "../taskpane";
 import { Conversation } from "./Conversation";
 import parseDialogMessage from "../schema";
-// import { generatePPT, generateTOC } from "../taskpane";
 
 interface AppProps {
   title: string;
@@ -23,6 +20,7 @@ const useStyles = makeStyles({
 const App: React.FC<AppProps> = (props: AppProps) => {
   const [conversation, setConversation] = useState<ConversationItem[]>([]);
   const styles = useStyles();
+  let dialog: Office.Dialog;
 
   const handleInputSubmit = async (text: string) => {
     const item: ConversationItem = {
@@ -33,7 +31,19 @@ const App: React.FC<AppProps> = (props: AppProps) => {
     setConversation(await postChat(newConversation));
   }
 
-  const handleDialogMessage = async(dialog: Office.Dialog, handler: any) => {
+  const handleDialogEvent = async(handler: any) => {
+      console.log("Dialog event: " + JSON.stringify(handler));
+      if (handler.error === 12006) {
+        console.log("Dialog is closed");
+        const item: ConversationItem = {
+          role: "ai",
+          content: `Dialog is closed`,
+        };
+        setConversation(prev => [...prev, item]);
+      }
+  }
+
+  const handleDialogMessage = async(handler: any) => {
     if (!("message" in handler) || handler === undefined) {
       dialog.close();
       console.error("dialog message failed:", handler);
@@ -86,10 +96,9 @@ const App: React.FC<AppProps> = (props: AppProps) => {
           console.error("Dialog open failed:", result.error.message);
           return;
         }
-        const dialog = result.value;
-        dialog.addEventHandler(Office.EventType.DialogMessageReceived, async (msg) => {
-          await handleDialogMessage(dialog, msg);
-        });
+        dialog = result.value;
+        dialog.addEventHandler(Office.EventType.DialogMessageReceived, handleDialogMessage);
+        dialog.addEventHandler(Office.EventType.DialogEventReceived, handleDialogEvent);
       }
     );
   }
@@ -99,8 +108,6 @@ const App: React.FC<AppProps> = (props: AppProps) => {
       <Header logo="assets/logo-filled.png" title={props.title} message="Office AI" />
       <Conversation conversation={conversation}></Conversation>
       <InputPane handleSubmit={handleInputSubmit} openDialog={openDialog}></InputPane>
-      {/* <PPTGenerator generateTOC={generateTOC} generatePPT={generatePPT}/> */}
-      {/* <Dialog></Dialog> */}
     </div>
   );
 };
