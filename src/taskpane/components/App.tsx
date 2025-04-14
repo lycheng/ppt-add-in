@@ -31,17 +31,17 @@ const App: React.FC<AppProps> = (props: AppProps) => {
     setConversation(await postChat(newConversation));
   }
 
-  const handleDialogEvent = async(handler: any) => {
-      console.log("Dialog event: " + JSON.stringify(handler));
-      if (handler.error === 12006) {
-        console.log("Dialog is closed");
-        const item: ConversationItem = {
-          role: "ai",
-          content: `Dialog is closed`,
-        };
-        setConversation(prev => [...prev, item]);
-      }
-  }
+  const handleDialogEvent = async (handler: any) => {
+    console.log("Dialog event: " + JSON.stringify(handler));
+    if (handler.error === 12006) {
+      console.log("Dialog is closed");
+      const item: ConversationItem = {
+        role: "ai",
+        content: `Dialog is closed`,
+      };
+      setConversation((prev) => [...prev, item]);
+    }
+  };
 
   const handleDialogMessage = async(handler: any) => {
     if (!("message" in handler) || handler === undefined) {
@@ -103,11 +103,18 @@ const App: React.FC<AppProps> = (props: AppProps) => {
     );
   }
 
+  const handlePing = async () => {
+    if (!dialog) {
+      return;
+    }
+    dialog.messageChild("from task pane");
+  }
+
   return (
     <div className={styles.root}>
       <Header logo="assets/logo-filled.png" title={props.title} message="Office AI" />
       <Conversation conversation={conversation}></Conversation>
-      <InputPane handleSubmit={handleInputSubmit} openDialog={openDialog}></InputPane>
+      <InputPane handleSubmit={handleInputSubmit} openDialog={openDialog} handlePing={handlePing}></InputPane>
     </div>
   );
 };

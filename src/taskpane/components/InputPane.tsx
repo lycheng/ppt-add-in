@@ -5,6 +5,7 @@ import { Stack } from '@fluentui/react';
 interface InputPaneProps {
     handleSubmit: (text: string) => Promise<any>;
     openDialog: () => void;
+    handlePing: () => void;
 }
 
 
@@ -78,12 +79,22 @@ const InputPane: React.FC<InputPaneProps> = (props: InputPaneProps) => {
           <Button
             appearance="secondary"
             style={{
-              width: "100px", // 固定宽度
+              width: "80px", // 固定宽度
               height: "36px", // 固定高度(可选)
             }}
             onClick={props.openDialog}
           >
             Draft PPT
+          </Button>
+          <Button
+            appearance="outline"
+            style={{
+              width: "30px", // 固定宽度
+              height: "36px", // 固定高度(可选)
+            }}
+            onClick={props.handlePing}
+          >
+            Ping
           </Button>
         </div>
       </Stack>
