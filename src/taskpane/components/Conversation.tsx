@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Avatar } from '@fluentui/react-components';
+import { Avatar, Button } from '@fluentui/react-components';
 import { Chat, ChatMessage, ChatMyMessage } from '@fluentui-contrib/react-chat';
 import { ConversationItem } from '../taskpane';
 import {
@@ -8,7 +8,38 @@ import {
 
 interface ConversationProps {
   conversation: ConversationItem[]
+  handleDraftPPT: () => any
 }
+
+interface MessageProps {
+  key: number
+  item: ConversationItem
+  handleDraftPPT?: () => any
+}
+
+const ConversationHumanMessage: React.FC<MessageProps> = (mp: MessageProps) => {
+  return <ChatMyMessage key={mp.key}>{mp.item.content}</ChatMyMessage>;
+}
+
+const ConversationAIMessage: React.FC<MessageProps> = (mp: MessageProps) => {
+  return (
+    <>
+      <ChatMessage
+        avatar={
+          <Avatar name="AI" badge={{ status: "available" }} icon={<BotRegular />} key={mp.key} />
+        }
+      >
+        {mp.item.content}
+        {mp.item.intent === "ppt" && (
+          <>
+            <br />
+            <Button appearance='primary' style={{ marginTop: "5px"}} onClick={mp.handleDraftPPT}>Draft PPT</Button>
+          </>
+        )}
+      </ChatMessage>
+    </>
+  );
+};
 
 export const Conversation: React.FC<ConversationProps> = (props: ConversationProps) => {
   return (
@@ -21,15 +52,9 @@ export const Conversation: React.FC<ConversationProps> = (props: ConversationPro
       {props.conversation.length > 0 &&
         props.conversation.map((item, index) => {
           if (item.role === "human") {
-            return <ChatMyMessage key={index}>{item.content}</ChatMyMessage>;
+            return <ConversationHumanMessage key={index} item={item}></ConversationHumanMessage>;
           }
-          return (
-            <ChatMessage
-              avatar={<Avatar name="AI" badge={{ status: "available" }} icon={<BotRegular />} key={index} />}
-            >
-              {item.content}
-            </ChatMessage>
-          );
+          return <ConversationAIMessage key={index} item={item} handleDraftPPT={props.handleDraftPPT}></ConversationAIMessage>;
         })}
     </Chat>
   );

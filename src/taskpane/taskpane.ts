@@ -5,8 +5,27 @@ import axios from 'axios';
 export interface ConversationItem {
   role: string
   content: string
+  intent?: string
   topic?: string
   toc?: string
+}
+
+export interface IntentResponse {
+  confident: number
+  follow_up: string
+  intent: string
+}
+
+export async function postIntent(query: string): Promise<IntentResponse> {
+  try {
+    const response = await axios.post('http://localhost:8000/intent', {
+      query: query 
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Failed to create user:', error);
+    return error;
+  }
 }
 
 export async function postChat(items: ConversationItem[]): Promise<ConversationItem[]> {

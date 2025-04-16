@@ -4,8 +4,8 @@ import { Stack } from '@fluentui/react';
 
 interface InputPaneProps {
     handleSubmit: (text: string) => Promise<any>;
-    openDialog: () => void;
-    handlePing: () => void;
+    // openDialog: () => void;
+    // handlePing: () => void;
 }
 
 
@@ -76,7 +76,7 @@ const InputPane: React.FC<InputPaneProps> = (props: InputPaneProps) => {
           >
             {isSubmitting ? "Sending..." : "Enter"}
           </Button>
-          <Button
+          {/* <Button
             appearance="secondary"
             style={{
               width: "80px", // 固定宽度
@@ -95,7 +95,7 @@ const InputPane: React.FC<InputPaneProps> = (props: InputPaneProps) => {
             onClick={props.handlePing}
           >
             Ping
-          </Button>
+          </Button> */}
         </div>
       </Stack>
     </div>

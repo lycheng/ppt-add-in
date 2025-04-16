@@ -3,7 +3,7 @@ import Header from "./Header";
 import { useState } from "react";
 import { makeStyles } from "@fluentui/react-components";
 import InputPane from "./InputPane";
-import { ConversationItem, postChat, generatePPTBase64 } from "../taskpane";
+import { ConversationItem, postIntent, generatePPTBase64 } from "../taskpane";
 import { Conversation } from "./Conversation";
 import parseDialogMessage from "../schema";
 
@@ -23,12 +23,33 @@ const App: React.FC<AppProps> = (props: AppProps) => {
   let dialog: Office.Dialog;
 
   const handleInputSubmit = async (text: string) => {
-    const item: ConversationItem = {
+    // TODO: with history
+    const intent = await postIntent(text);
+    if (intent.intent.toLowerCase() === "ppt") {
+      const humanItem: ConversationItem = {
+        role: "human",
+        content: text
+      };
+      const aiItem: ConversationItem = {
+        role: "ai",
+        content: intent.follow_up,
+        intent: "ppt"
+      };
+      setConversation((prev) => [...prev, humanItem, aiItem]);
+      return;
+    }
+
+    const hItem: ConversationItem = {
       role: "human",
       content: text
     };
-    const newConversation = [...conversation, item];
-    setConversation(await postChat(newConversation));
+    const aItem: ConversationItem = {
+      role: "ai",
+      content: intent.follow_up
+    };
+    setConversation((prev) => [...prev, hItem, aItem]);
+    // const newConversation = [...conversation, item];
+    // setConversation(await postChat(newConversation));
   }
 
   const handleDialogEvent = async (handler: any) => {
@@ -113,8 +134,8 @@ const App: React.FC<AppProps> = (props: AppProps) => {
   return (
     <div className={styles.root}>
       <Header logo="assets/logo-filled.png" title={props.title} message="Office AI" />
-      <Conversation conversation={conversation}></Conversation>
-      <InputPane handleSubmit={handleInputSubmit} openDialog={openDialog} handlePing={handlePing}></InputPane>
+      <Conversation conversation={conversation} handleDraftPPT={openDialog}></Conversation>
+      <InputPane handleSubmit={handleInputSubmit}></InputPane>
     </div>
   );
 };
