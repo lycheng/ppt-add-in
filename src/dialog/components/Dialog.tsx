@@ -1,9 +1,9 @@
 import * as React from "react";
 import { Input, Button, makeStyles, Spinner } from "@fluentui/react-components";
 import { Toaster, Toast, ToastTitle, ToastBody, ToastFooter, useToastController } from "@fluentui/react-components";
-import Editor from 'react-simple-code-editor';
-import { highlight, languages } from 'prismjs';
-import 'prismjs/components/prism-markdown';
+import Editor from "./Editor";
+// import { highlight, languages } from 'prismjs';
+// import 'prismjs/components/prism-markdown';
 import { generateTOC } from "../dialog";
 
 const useStyles = makeStyles({
@@ -24,7 +24,7 @@ const useStyles = makeStyles({
   }
 });
 
-const DialogApp = () => {
+const Dialog = () => {
   const styles = useStyles();
   const [topic, setTopic] = React.useState("");
   const [toc, setToc] = React.useState<string>("");
@@ -95,11 +95,6 @@ const DialogApp = () => {
     );
   };
 
-  const highlightWithTitles = (code) => {
-    let highlighted = highlight(code, languages.markdown, "markdown");
-    return highlighted;
-  };
-
   return (
     <div className={styles.root}>
       <Toaster toasterId={toasterId} />
@@ -130,30 +125,10 @@ const DialogApp = () => {
         </Button>
       </div>
       <div className={styles.editorContainer}>
-        {toc && (
-          <div>
-            <Editor
-              value={toc}
-              onValueChange={setToc}
-              highlight={highlightWithTitles}
-              padding={10}
-              style={{
-                backgroundColor: "#f5f5f5",
-                minHeight: "300px",
-                borderRadius: "4px",
-                border: "1px solid #ddd",
-              }}
-              textareaClassName="editor-textarea"
-              preClassName="language-markdown"
-            />
-            <Button appearance="primary" onClick={clickConfirmTOC} style={{ marginTop: "5px" }}>
-              Confirm
-            </Button>
-          </div>
-        )}
+        <Editor></Editor>
       </div>
     </div>
   );
 };
 
-export default DialogApp;
+export default Dialog;

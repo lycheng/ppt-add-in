@@ -4,7 +4,7 @@ import { Stack } from '@fluentui/react';
 
 interface InputPaneProps {
     handleSubmit: (text: string) => Promise<any>;
-    // openDialog: () => void;
+    openDialog: () => void;
     // handlePing: () => void;
 }
 
@@ -76,7 +76,7 @@ const InputPane: React.FC<InputPaneProps> = (props: InputPaneProps) => {
           >
             {isSubmitting ? "Sending..." : "Enter"}
           </Button>
-          {/* <Button
+          <Button
             appearance="secondary"
             style={{
               width: "80px", // 固定宽度
@@ -86,6 +86,7 @@ const InputPane: React.FC<InputPaneProps> = (props: InputPaneProps) => {
           >
             Draft PPT
           </Button>
+          {/*
           <Button
             appearance="outline"
             style={{

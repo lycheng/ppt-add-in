@@ -1,5 +1,5 @@
 import * as React from "react";
-import DialogApp from "./components/DialogApp";
+import Dialog from "./components/Dialog";
 import { createRoot } from "react-dom/client";
 import { FluentProvider, webLightTheme } from "@fluentui/react-components";
 
@@ -14,14 +14,14 @@ const root = rootElement ? createRoot(rootElement) : undefined;
 Office.onReady(() => {
   root?.render(
     <FluentProvider theme={webLightTheme}>
-      <DialogApp />
+      <Dialog />
     </FluentProvider>
   );
 });
 
 if ((module as any).hot) {
-  (module as any).hot.accept("./components/DialogApp", () => {
-    const NextApp = require("./components/DialogApp").default;
+  (module as any).hot.accept("./components/Dialog", () => {
+    const NextApp = require("./components/Dialog").default;
     root?.render(NextApp);
   });
 }

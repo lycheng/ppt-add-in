@@ -135,7 +135,7 @@ const App: React.FC<AppProps> = (props: AppProps) => {
     <div className={styles.root}>
       <Header logo="assets/logo-filled.png" title={props.title} message="Office AI" />
       <Conversation conversation={conversation} handleDraftPPT={openDialog}></Conversation>
-      <InputPane handleSubmit={handleInputSubmit}></InputPane>
+      <InputPane handleSubmit={handleInputSubmit} openDialog={openDialog}></InputPane>
     </div>
   );
 };
